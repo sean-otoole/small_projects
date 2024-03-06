@@ -1,5 +1,5 @@
-# execute this script in a directory containing photos and movies and all files will be renamed with the date and time of acquisition
-# photos and movies are then ordered by time when sorting with name
+# execute this script will allow the user to select a folder
+# photos and movies, within the folder are then ordered by time when sorting with name
 
 import os
 from datetime import datetime
@@ -17,13 +17,12 @@ def get_the_file_name(current_path):
         try:
             parser = createParser(current_path)
             metadata = extractMetadata(parser)
-            if metadata and 'creation_date' in metadata:
-                date = metadata.get('creation_date')
-                formatted_date = date.strftime('%Y-%m-%d_%H-%M-%S')
-                file_extension = os.path.splitext(current_path)[-1]
-                new_filename = f"{formatted_date}{file_extension}"
-            else:
-                print(f"No metadata found for file: {os.path.basename(current_path)}")
+            date_str = (str(metadata).split("Creation date: ")[1])
+            creation_date = date_str.split('\n')[0]
+            formatted_date = datetime.strptime(creation_date, '%Y-%m-%d %H:%M:%S')
+            file_extension = os.path.splitext(current_path)[-1]
+            new_filename = f"{formatted_date}{file_extension}"
+            new_filename = new_filename.replace(" ", "_")
         except Exception as e:
             print(f"Error extracting metadata from '{os.path.basename(current_path)}': {e}")
     
@@ -35,7 +34,7 @@ def get_the_file_name(current_path):
                 if 'EXIF DateTimeOriginal' in tags:
                     metadata_str = str(tags['EXIF DateTimeOriginal'])
                     date_obj = datetime.strptime(metadata_str, '%Y:%m:%d %H:%M:%S')
-                    filename_date = date_obj.strftime('%Y-%m-%d_%H-%M-%S')
+                    filename_date = date_obj.strftime('%Y-%m-%d_%H:%M:%S')
                     file_extension = os.path.splitext(current_path)[-1]
                     new_filename = f"{filename_date}{file_extension}"
                 else:
