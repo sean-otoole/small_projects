@@ -1,6 +1,9 @@
 # execute this script will allow the user to select a folder
 # photos and movies, within the folder are then ordered by time when sorting with name
 
+# missing functionality
+# check for duplicates and remove
+
 import os
 from datetime import datetime
 import exifread
@@ -70,6 +73,35 @@ def rename_files_in_directory(directory_path):
 
     return renamed_files_count  # Return the count of renamed files
 
+# function for removing duplicate images
+
+def remove_duplicates(directory_path):
+    print(directory_path)
+    duplicates_removed = 0  # Initialize the counter for removed duplicates
+    entries = os.listdir(directory_path)
+    all_files = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+    print(f"Starting file count: {len(all_files)}")  # sanity check
+    for file in all_files:
+        if os.path.isfile(os.path.join(directory_path, file)):   #make sure files has not been deleted
+            print('we have a file')
+            current_index = all_files.index(file);
+            if current_index+1 < len(all_files):
+                current_file = all_files[current_index]
+                adjacent_index = current_index + 1
+                adjacent_file = all_files[adjacent_index]
+                if open(current_file,"rb").read() == open(adjacent_file,"rb").read():
+                    os.remove(adjacent_file)
+                    duplicates_removed += 1  # Increment the counter 
+                    print('duplicate found, and file removed')
+                else:
+                    print('no duplicate')
+            else:
+                print('Finished clearing duplicates')
+                break
+        else:
+            continue # go to the next loop iteration if a file has been deleted
+    return duplicates_removed  # Return the count of duplicate files that have been removed
+
 def select_folder():
     root = tk.Tk()
     root.withdraw()  # Hide the main window
@@ -84,6 +116,8 @@ if __name__ == "__main__":
     if directory_path:  # Proceed only if a folder was selected
         renamed_files_count = rename_files_in_directory(directory_path)
         print(f"Total files renamed: {renamed_files_count}")  # Report the total count of renamed files
+        duplicates_removed = remove_duplicates(directory_path)
+        print(f"Total duplicates removed: {duplicates_removed}")  # Report the total count of renamed files
     else:
         print("No folder selected, exiting.")
 
