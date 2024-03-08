@@ -3,6 +3,7 @@
 
 # missing functionality
 # check for duplicates and remove
+# code added but not yet working
 
 import os
 from datetime import datetime
