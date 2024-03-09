@@ -80,6 +80,7 @@ def remove_duplicates(directory_path):
     duplicates_removed = 0  # Initialize the counter for removed duplicates
     entries = os.listdir(directory_path)
     all_files = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+    all_files = sorted(all_files)
     print(f"Starting file count: {len(all_files)}")  # sanity check
     for file in all_files:
         if os.path.isfile(os.path.join(directory_path, file)):   #make sure files has not been deleted
@@ -89,16 +90,19 @@ def remove_duplicates(directory_path):
                 current_file = all_files[current_index]
                 adjacent_index = current_index + 1
                 adjacent_file = all_files[adjacent_index]
-                if open(current_file,"rb").read() == open(adjacent_file,"rb").read():
-                    os.remove(adjacent_file)
-                    duplicates_removed += 1  # Increment the counter 
-                    print('duplicate found, and file removed')
-                else:
-                    print('no duplicate')
+                current_file = os.path.join(directory_path, current_file)
+                adjacent_file = os.path.join(directory_path, adjacent_file)
+                with open(current_file, "rb") as file1, open(adjacent_file, "rb") as file2:
+                    if file1.read() == file2.read():
+                        print('file should be removed')
+                        os.remove(adjacent_file)
+                        duplicates_removed += 1  # Increment the counter 
+                    else:
+                        continue
             else:
                 print('Finished clearing duplicates')
-                break
         else:
+            print('file was removed')
             continue # go to the next loop iteration if a file has been deleted
     return duplicates_removed  # Return the count of duplicate files that have been removed
 
@@ -117,6 +121,7 @@ if __name__ == "__main__":
         renamed_files_count = rename_files_in_directory(directory_path)
         print(f"Total files renamed: {renamed_files_count}")  # Report the total count of renamed files
         duplicates_removed = remove_duplicates(directory_path)
+        duplicates_removed = remove_duplicates(directory_path)   #ran again because triplicates
         print(f"Total duplicates removed: {duplicates_removed}")  # Report the total count of renamed files
     else:
         print("No folder selected, exiting.")
