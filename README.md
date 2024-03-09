@@ -10,3 +10,5 @@
 - Integration with Dropbox API for cloud-based organization.
 - Enhanced modularization for easier expansion.
 - Scheduled daily operations using AWS Lambda.
+- E-mail reporting for renaming and photo removal.
+- Subfolder for photos to be removed.
