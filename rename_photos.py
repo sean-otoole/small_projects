@@ -5,6 +5,7 @@
 # check for duplicates and remove
 
 import os
+import re
 from datetime import datetime
 import exifread
 from hachoir.parser import createParser
@@ -49,29 +50,50 @@ def get_the_file_name(current_path):
 
 def rename_files_in_directory(directory_path):
     renamed_files_count = 0  # Initialize the counter for renamed files
-
+    pattern = r"Foto (\d{2})\.(\d{2})\.(\d{2}), (\d{2}) (\d{2}) (\d{2}).*\.jpg"
+    
     for filename in os.listdir(directory_path):
         current_path = os.path.join(directory_path, filename)
-        if os.path.isfile(current_path):  # Check if it's a file
+        match = re.match(pattern, filename)
+        
+        if os.path.isfile(current_path) and match:  # Check if it's a file and matches the pattern
+            print(f"Found a match for {filename}!")
+            
+            # Extract the date and time components
+            day, month, year, hour, minute, second = match.groups()
+            
+            # Construct the new filename
+            new_filename = f"20{year}-{month}-{day}_{hour}:{minute}:{second}.jpg"
+            
+            # Create the full file paths
+            old_file_path = os.path.join(directory_path, filename)
+            new_file_path = os.path.join(directory_path, new_filename)
+            
+            # Rename the file
+            os.rename(old_file_path, new_file_path)
+            print(f"Renamed '{filename}' to '{new_filename}'")
+            renamed_files_count += 1  # Increment the counter
+        
+        elif os.path.isfile(current_path):
             try:
                 new_filename = get_the_file_name(current_path)
                 if new_filename:  # Check if a new filename was generated
                     new_path = os.path.join(directory_path, new_filename)
-                    
                     # Conflict resolution
                     counter = 1
                     base_new_path, ext = os.path.splitext(new_path)
                     while os.path.exists(new_path):
                         new_path = f"{base_new_path}_{counter}{ext}"
                         counter += 1
-                    
                     os.rename(current_path, new_path)
                     print(f"Renamed '{filename}' to '{os.path.basename(new_path)}'")
                     renamed_files_count += 1  # Increment the counter
+            
             except Exception as e:
                 print(f"Error processing '{filename}': {e}")
-
+    
     return renamed_files_count  # Return the count of renamed files
+
 
 # function for removing duplicate images
 
@@ -84,7 +106,6 @@ def remove_duplicates(directory_path):
     print(f"Starting file count: {len(all_files)}")  # sanity check
     for file in all_files:
         if os.path.isfile(os.path.join(directory_path, file)):   #make sure files has not been deleted
-            print('we have a file')
             current_index = all_files.index(file);
             if current_index+1 < len(all_files):
                 current_file = all_files[current_index]
