@@ -142,7 +142,7 @@ if __name__ == "__main__":
         renamed_files_count = rename_files_in_directory(directory_path)
         print(f"Total files renamed: {renamed_files_count}")  # Report the total count of renamed files
         duplicates_removed = remove_duplicates(directory_path)
-        duplicates_removed = remove_duplicates(directory_path)   #ran again because triplicates
+        duplicates_removed = remove_duplicates(directory_path)   #ran again due to triplicates
         print(f"Total duplicates removed: {duplicates_removed}")  # Report the total count of renamed files
     else:
         print("No folder selected, exiting.")
