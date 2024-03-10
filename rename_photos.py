@@ -1,9 +1,6 @@
 # execute this script will allow the user to select a folder
 # photos and movies, within the folder are then ordered by time when sorting with name
 
-# missing functionality
-# check for duplicates and remove
-
 import os
 import re
 from datetime import datetime
